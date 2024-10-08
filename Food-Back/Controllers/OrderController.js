@@ -7,12 +7,14 @@ import stripe from 'stripe';
     const placeOrder = async (req,res)=>{
         const frontend_url = "https://localhost:5173";
             try {
+                console.log(req.body);
                 const newOrder = new orderModel({
                     userId: req.body.userId,
                     items:req.body.items,
                     amount:req.body.amount,
                     address:req.body.address,
                 })
+                console.log(newOrder);
                 await newOrder.save();
                 await userModel.findByIdAndUpdate(req.body.userId,{cartData:{}});
 
@@ -26,8 +28,6 @@ import stripe from 'stripe';
                     },
                     quantity: item.quantity
                 }))
-
-
                 line_items.push({
                     price_data:{
                         currency :"inr",
@@ -38,7 +38,6 @@ import stripe from 'stripe';
                     },
                     quantity:1
                 })
-
                 const session = await stripe.checkout.sessions.create({
                     line_items:line_items,
                     mode: 'payment',

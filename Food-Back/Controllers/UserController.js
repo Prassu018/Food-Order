@@ -25,7 +25,6 @@ const loginUser = async(req,res)=>{
         console.log("Error");
         res.json({success:false,message:'This is Error'});
     }
-
 }
 const createToken = (id) =>{
     return jwt.sign({id},process.env.JWT_SECRET)
@@ -55,7 +54,8 @@ const registerUser = async(req,res)=>{
         const newUser = new userModel({
             name:name,
             email:email,
-            password:hashedPassword
+            password:hashedPassword,
+            // cartData: {}
         })
 
        const user = await newUser.save();
