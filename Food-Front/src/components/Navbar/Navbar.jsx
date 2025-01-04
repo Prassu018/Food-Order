@@ -40,7 +40,6 @@ const Navbar = ({setShowLogin}) => {
             <li onClick={LogOut}><img src={assets.logout_icon} alt="" /><p>LogOut</p></li>
           </ul>
           </div>}
-       
       </div>
     </div>
   )

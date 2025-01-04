@@ -3,13 +3,12 @@ import orderModel from "../Models/orderModel.js";
 import userModel from '../Models/userModel.js';
 import stripe from 'stripe';
 // placing user order for frontend
-
     const placeOrder = async (req,res)=>{
         const frontend_url = "https://localhost:5173";
             try {
                 console.log(req.body);
                 const newOrder = new orderModel({
-                    userId: req.body.userId,
+                    userId:req.body.userId,
                     items:req.body.items,
                     amount:req.body.amount,
                     address:req.body.address,
@@ -51,7 +50,6 @@ import stripe from 'stripe';
                 
             }
         }
-    
 
 // const verifyOrder = async (res,req)=>{
 //     const {orderId,success} =  req.body;
@@ -80,4 +78,16 @@ const userOrders = async (res,req)=>{
         res.json({success:false,message:"Error"});
     }
 }
-export {placeOrder,userOrders} 
+
+// order for admin panel 
+const listOrders = async (req,res)=>{
+try {
+    const orders = await orderModel.find({});
+    res.json({success:true,data:orders});
+} catch (error) {
+    console.log(error);
+    res.json({success:false,message:"Error"});
+    
+}
+}
+export {placeOrder,userOrders,listOrders} 

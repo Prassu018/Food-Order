@@ -1,38 +1,68 @@
-import React, { useContext, useEffect, useState } from 'react'
-import './PlaceOrder.css'
-import { StoreContext } from '../../Context/StoreContext'
-import axios from 'axios'
+import React, { useContext, useEffect, useState } from 'react';
+import './PlaceOrder.css';
+import { StoreContext } from '../../Context/StoreContext';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const PlaceOrder = () => {
+  const { getTotalCartAmount, token, food_list, cartItems, url } = useContext(StoreContext);
+  const [data, setData] = useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    street: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "",
+    phone: "",
+  });
 
-  const{getTotalCartAmount,token,food_list,cartItems,url} = useContext(StoreContext)
-  const [data,setData] = useState({
-    firstname:"",
-    lastname:"",
-    email:"",
-    street:"",
-    city:"",
-    state:"",
-    zip:"",
-    country:"",
-    phone:"",
-  })
-
-  const onChangeHandler= (e)=>{
+  // Handle input change
+  const onChangeHandler = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-    setData(data=>({...data,[name]:value}))
-  }
-  const placeorder = async(e)=>{
+    setData(data => ({ ...data, [name]: value }));
+  };
+
+  // Handle place order
+  const placeorder = async (e) => {
     e.preventDefault();
+
     let orderItems = [];
-    food_list.map((item)=>{
-      if (cartItems[item._id]>0) {
-        let itemInfo =item;
-        itemInfo["quantity"] = cartItems[item._id]
+
+    // Check if there are items in the cart
+    food_list.map((item) => {
+      if (cartItems[item._id] > 0) {
+        let itemInfo = item;
+        itemInfo["quantity"] = cartItems[item._id];
         orderItems.push(itemInfo);
       }
-    })
+    });
+
+    // If cart is empty, show an error message and stop the process
+    if (orderItems.length === 0) {
+      toast.error("Your cart is empty. Please add items to the cart before proceeding.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return; // Stop further execution
+    }
+
+    // If there are items in the cart, show success message
+    toast.success("Yay!! 😊 Order Placed successfully!!", {
+      position: "top-right",
+      autoClose: 3000,
+    });
+
+    // // The following is the original API logic (remains unchanged)
+    // let orderData = {
+    //   address: data,
+    //   items: orderItems,
+    //   amount: getTotalCartAmount() + 2,  // Add delivery fee of 2
+    // };
+
     let orderData = {
       address:data,
     items:orderItems,
@@ -47,54 +77,59 @@ const PlaceOrder = () => {
       alert("error")
     }
   }
-  
 
   return (
-    <form onSubmit={placeorder} className='place-order'>
-      <div className="place-order-left">
-        <p className="title">Delivery Information </p>
-        <div className="multi-fields">
-          <input required name='firstname' onChange={onChangeHandler} value={data.firstname} type="text" placeholder='First name' />
-          <input required name='lastname' onChange={onChangeHandler}  value={data.lastname} type="text"  placeholder='Last name'/>
+    <>
+      <form onSubmit={placeorder} className='place-order'>
+        <div className="place-order-left">
+          <p className="title">Delivery Information</p>
+          <div className="multi-fields">
+            <input required name='firstname' onChange={onChangeHandler} value={data.firstname} type="text" placeholder='First name' />
+            <input required name='lastname' onChange={onChangeHandler} value={data.lastname} type="text" placeholder='Last name' />
+          </div>
+          <input required name='email' onChange={onChangeHandler} value={data.email} type="text" placeholder='Email address' />
+          <input required name='street' onChange={onChangeHandler} value={data.street} type="text" placeholder='Street' />
+          <div className="multi-fields">
+            <input required name='city' onChange={onChangeHandler} value={data.city} type="text" placeholder='City' />
+            <input required name='state' onChange={onChangeHandler} value={data.state} type="text" placeholder='State' />
+          </div>
+          <div className="multi-fields">
+            <input required name='zip' onChange={onChangeHandler} value={data.zip} type="text" placeholder='Zip code' />
+            <input required name='country' onChange={onChangeHandler} value={data.country} type="text" placeholder='Country' />
+          </div>
+          <input required name='phone' onChange={onChangeHandler} value={data.phone} type="text" placeholder='Phone' />
         </div>
-        <input required name='email' onChange={onChangeHandler} value={data.email} type="text" placeholder='Email address'/>
-        <input required name='street' onChange={onChangeHandler} value={data.street} type="text" placeholder='Street'/>
-        <div className="multi-fields">
-          <input required name='city' onChange={onChangeHandler} value={data.city}  type="text" placeholder='City' />
-          <input required name='state' onChange={onChangeHandler} value={data.state}  type="text"  placeholder='State'/>
-        </div>
-        <div className="multi-fields">
-          <input required name='zip' onChange={onChangeHandler} value={data.zip}  type="text" placeholder='Zip code' />
-          <input required name='country' onChange={onChangeHandler} value={data.country}  type="text"  placeholder='Country'/>
-        </div>
-        <input required name='phone' onChange={onChangeHandler} value={data.phone}  type="text" placeholder='Phone' />
-        </div> 
+
         <div className="place-order-right">
-        <div className="cart-bottom">
-        <div className="cart-total">
-          <h2>Cart Totals</h2>
-          <div>
-            <div className="cart-total-details">
-              <p>Subtotal</p>
-              <p>${getTotalCartAmount()}</p>
-            </div>
-            <hr />
-            <div className="cart-total-details">
-              <p>Delivery fee</p>
-              <p>{getTotalCartAmount()===0?0:2}</p>
-            </div>
-            <hr />
-            <div className="cart-total-details">
-              <b>Total</b>
-              <b>${getTotalCartAmount()===0?0:getTotalCartAmount()+2}</b>
+          <div className="cart-bottom">
+            <div className="cart-total">
+              <h2>Cart Totals</h2>
+              <div>
+                <div className="cart-total-details">
+                  <p>Subtotal</p>
+                  <p>${getTotalCartAmount()}</p>
+                </div>
+                <hr />
+                <div className="cart-total-details">
+                  <p>Delivery fee</p>
+                  <p>{getTotalCartAmount() === 0 ? 0 : 2}</p>
+                </div>
+                <hr />
+                <div className="cart-total-details">
+                  <b>Total</b>
+                  <b>${getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}</b>
+                </div>
+              </div>
+              <button type='submit'>Order Now!!</button>
             </div>
           </div>
-          <button  type='submit'>Proceed to Payment</button>
         </div>
-        </div>
-        </div>
-    </form>
-  )
-}
+      </form>
 
-export default PlaceOrder
+      {/* Toast container to show popup notifications */}
+      <ToastContainer />
+    </>
+  );
+};
+
+export default PlaceOrder;

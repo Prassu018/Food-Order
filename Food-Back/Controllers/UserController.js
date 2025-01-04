@@ -30,7 +30,6 @@ const createToken = (id) =>{
     return jwt.sign({id},process.env.JWT_SECRET)
 }
 // register user
-
 const registerUser = async(req,res)=>{
     const {name,email,password} = req.body;
     try {
@@ -45,7 +44,6 @@ const registerUser = async(req,res)=>{
         }
         if(password.length<8){
             return res.json({success:false,message:'please enter a Strong password'});
-
         }
         // hash password
         const salt = await bcrypt.genSalt(10);
@@ -66,5 +64,4 @@ const registerUser = async(req,res)=>{
          res.json({success:false,message:'This is Error'});
     }
 }
-
 export {loginUser,registerUser}
